@@ -1,6 +1,11 @@
 spring:
   application:
     name: "Call Center Application"
+  profiles:
+    active: prd
   jackson:
     serialization:
       write-dates-as-timestamps: false
+
+server:
+  port: 8081
