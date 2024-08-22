@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: "Call Center Application"
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
