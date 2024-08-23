@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 public class RegisterIssueServiceImpl implements RegisterIssueService {
 
     private final IssuePublisher cardIssuesPublisher;
-    private final IssuePublisher loanIssuesPublisher;;
-    private final IssuePublisher otherIssuesPublisher;;
+    private final IssuePublisher loanIssuesPublisher;
+    private final IssuePublisher otherIssuesPublisher;
 
     public RegisterIssueServiceImpl(
         IssuePublisher cardIssuesPublisher,

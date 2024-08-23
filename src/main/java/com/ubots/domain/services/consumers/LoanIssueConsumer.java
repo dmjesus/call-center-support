@@ -1,5 +1,13 @@
 package com.ubots.domain.services.consumers;
 
-public class LoanIssueConsumer {
+import com.ubots.domain.entities.issue.Issue;
+import java.util.LinkedList;
+import org.springframework.stereotype.Component;
 
+@Component
+public class LoanIssueConsumer extends DefaultConsumer {
+
+    public LoanIssueConsumer(LinkedList<Issue> loanIssuesQueue) {
+        super(loanIssuesQueue);
+    }
 }

@@ -2,13 +2,7 @@ package com.ubots.domain.entities.support;
 
 public class OtherAttendant extends Attendant {
 
-    @Override
-    public void receiveCallMessage() {
-
-    }
-
-    @Override
-    public void completeCallMessage() {
-
+    public OtherAttendant(String firstName, String lastName) {
+        super(firstName, lastName);
     }
 }

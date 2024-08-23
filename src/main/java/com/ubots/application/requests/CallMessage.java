@@ -1,4 +1,4 @@
-package com.ubots.domain.entities.requests;
+package com.ubots.application.requests;
 
 import java.util.ArrayList;
 
