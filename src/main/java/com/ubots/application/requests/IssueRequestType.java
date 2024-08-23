@@ -1,5 +1,5 @@
 package com.ubots.application.requests;
 
-public enum IssueType {
+public enum IssueRequestType {
     CARD, LOAN, OTHER
 }

@@ -15,6 +15,11 @@ public class DefaultAttendantService implements AttendantService {
     }
 
     @Override
+    public List<Attendant> listAttendants() {
+        return attendantList;
+    }
+
+    @Override
     public Optional<Attendant> findAttendant(String attendantId) {
         return attendantList.stream().filter(att ->
             att.getId().equals(UUID.fromString(attendantId))

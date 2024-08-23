@@ -36,17 +36,18 @@ public class IssueCreateController {
     }
 
     @PostMapping("/issue")
-    public ResponseEntity<Object> postMessage(@RequestBody String message) {
+    public ResponseEntity<Object> postMessage(@RequestBody String request) {
         try {
-            var request = mapper.readValue(message, CreateIssueRequest.class);
+            var createIssueRequest = mapper.readValue(request, CreateIssueRequest.class);
+            final Issue issueToCreate = toIssue(createIssueRequest);
 
-            switch (request.type()) {
-                case LOAN -> loanIssueService.create(toIssue(request));
-                case CARD -> cardIssueService.create(toIssue(request));
-                default -> otherIssueService.create(toIssue(request));
+            switch (createIssueRequest.type()) {
+                case LOAN -> loanIssueService.create(issueToCreate);
+                case CARD -> cardIssueService.create(issueToCreate);
+                default -> otherIssueService.create(issueToCreate);
             }
 
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(issueToCreate.id());
         } catch (JsonProcessingException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }

@@ -1,7 +1,10 @@
 package com.ubots.application.controllers;
 
 import com.ubots.application.interfaces.AttendantService;
+import com.ubots.domain.entities.support.Attendant;
 import com.ubots.domain.entities.support.AttendantType;
+import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +29,30 @@ public class AttendantController {
         this.otherAttendantService = otherAttendantService;
     }
 
+    @GetMapping("/attendant/all")
+    public ResponseEntity<List<Attendant>> listAttendants(
+        @RequestParam(required = false) AttendantType attendantType
+    ) {
+
+        if (attendantType == null) {
+            return ResponseEntity.ok(
+                Stream.of(
+                    cardAttendantService.listAttendants(),
+                    loanAttendantService.listAttendants(),
+                    otherAttendantService.listAttendants()
+                ).flatMap(List::stream).toList()
+            );
+        }
+
+        return switch (attendantType) {
+            case CARD -> ResponseEntity.ok(cardAttendantService.listAttendants());
+            case LOAN -> ResponseEntity.ok(loanAttendantService.listAttendants());
+            case OTHER -> ResponseEntity.ok(otherAttendantService.listAttendants());
+        };
+    }
+
     @GetMapping("/attendant")
-    public ResponseEntity<Object> getAttendant(
+    public ResponseEntity<Object> listAttendants(
         @RequestParam String attendantId,
         @RequestParam AttendantType attendantType
     ) {

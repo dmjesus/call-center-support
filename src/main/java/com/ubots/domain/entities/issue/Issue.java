@@ -4,6 +4,7 @@ import static com.ubots.domain.entities.issue.IssueState.OPEN;
 
 import com.ubots.domain.entities.client.Client;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -48,8 +49,8 @@ public record Issue(
             type,
             answers,
             OPEN,
-            LocalDateTime.now(),
-            LocalDateTime.now(),
+            LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+            null,
             new ArrayList<>(),
             null
         );

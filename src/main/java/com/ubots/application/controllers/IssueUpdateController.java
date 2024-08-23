@@ -1,6 +1,7 @@
 package com.ubots.application.controllers;
 
 import com.ubots.application.interfaces.IssueService;
+import com.ubots.application.requests.IssueRequestType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,13 +58,12 @@ public class IssueUpdateController {
     @PatchMapping("/close/issue")
     public ResponseEntity<Object> close(
         @RequestParam String issueId,
-        @RequestParam String issueType
+        @RequestParam IssueRequestType issueType
     ) {
         return switch (issueType) {
-            case "CARD" -> ResponseEntity.ok(cardIssueService.closeIssue(issueId));
-            case "LOAN" -> ResponseEntity.ok(loanIssueService.closeIssue(issueId));
-            case "OTHER" -> ResponseEntity.ok(otherIssueService.closeIssue(issueId));
-            default -> ResponseEntity.badRequest().build();
+            case CARD-> ResponseEntity.ok(cardIssueService.closeIssue(issueId));
+            case LOAN-> ResponseEntity.ok(loanIssueService.closeIssue(issueId));
+            case OTHER -> ResponseEntity.ok(otherIssueService.closeIssue(issueId));
         };
     }
 }

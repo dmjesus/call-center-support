@@ -6,7 +6,11 @@ import com.ubots.application.interfaces.AttendantService;
 import com.ubots.application.interfaces.IssueService;
 import com.ubots.domain.entities.issue.Issue;
 import com.ubots.domain.entities.issue.IssueState;
+import com.ubots.domain.entities.issue.IssueType;
+import com.ubots.domain.exception.AttendantAtCapacity;
+import com.ubots.domain.exception.InvalidInputParamsException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,20 +35,20 @@ public abstract class DefaultIssueService implements IssueService {
     @Override
     public boolean allocate(String issueId, String attendantId) {
         if (attendantId == null || attendantId.isBlank()) {
-            return false;
+            throw new InvalidInputParamsException("the given attendant id is invalid");
         }
 
         var attendant = attendantService.findAttendant(attendantId);
 
         if (attendant.isPresent()) {
 
-            if(attendant.get().getSupportQueue().size() < 3) {
+            if (attendant.get().getSupportQueue().size() < 3) {
 
                 var openIssue = issuesQueue.stream().filter(issue ->
                     issue.state() == IssueState.OPEN && issue.id().equals(issueId)
                 ).findFirst();
 
-                if(openIssue.isPresent()) {
+                if (openIssue.isPresent()) {
                     var presentIssue = openIssue.get();
                     presentIssue.notes().add("Allocated to " + attendantId);
 
@@ -59,37 +63,43 @@ public abstract class DefaultIssueService implements IssueService {
                         presentIssue.notes(),
                         attendant.get().getId().toString()
                     );
-
+                    issuesQueue.removeIf(iss -> iss.id().equals(openIssue.get().id()));
                     issuesQueue.add(processingIssue);
+                    attendant.get().getSupportQueue().add(processingIssue.id());
                 }
                 return true;
             } else {
-                System.out.println("Attendant " + attendantId + " at limit capacity");
-                return false;
+                throw new AttendantAtCapacity("Attendant " + attendant.get().getId() + "is at capacity");
             }
         }
 
-        System.out.println("Attendant " + attendantId + " not found");
-
-        return false;
+        throw new InvalidInputParamsException("Attendant " + attendantId + " not found");
     }
 
     @Override
     public boolean reallocate(String issueId, String newAttendantId) {
         var foundIssue = findIssue(issueId);
 
-        if(foundIssue.isPresent()) {
+        if (foundIssue.isPresent()) {
             var oldAttendant = attendantService.findAttendant(foundIssue.get().attendantId());
             var newAttendant = attendantService.findAttendant(newAttendantId);
 
-            if(newAttendant.isPresent()) {
+            if (newAttendant.isPresent()) {
 
                 newAttendant.get().getSupportQueue().add(issueId);
 
-                oldAttendant.ifPresent(attendant ->
-                    attendant.getSupportQueue().removeIf(iss ->
-                        iss.equals(issueId)
-                    )
+                oldAttendant.ifPresent(attendant -> {
+                        if (attendant.getSupportQueue().removeIf(iss -> iss.equals(issueId))) {
+                            String note = "Issue reallocated from " +
+                                attendant.getId() +
+                                "to " +
+                                newAttendant.get().getId();
+                            addNote(
+                                issueId,
+                                note
+                            );
+                        }
+                    }
                 );
             }
 
@@ -113,7 +123,7 @@ public abstract class DefaultIssueService implements IssueService {
                         presentIssue.answers(),
                         CLOSED,
                         presentIssue.createdAt(),
-                        LocalDateTime.now(),
+                        LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
                         presentIssue.notes(),
                         presentIssue.attendantId()
                     )
@@ -140,6 +150,13 @@ public abstract class DefaultIssueService implements IssueService {
         return issuesQueue.stream().filter(iss ->
             iss.id().equals(issueId)
         ).findFirst();
+    }
+
+    @Override
+    public List<Issue> listIssueByType(IssueType issueType) {
+        return issuesQueue.stream().filter(iss ->
+            iss.type() == issueType
+        ).toList();
     }
 
     @Override

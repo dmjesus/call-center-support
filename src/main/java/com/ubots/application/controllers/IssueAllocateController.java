@@ -1,11 +1,13 @@
 package com.ubots.application.controllers;
 
 import com.ubots.application.interfaces.IssueService;
-import com.ubots.application.requests.IssueType;
+import com.ubots.application.requests.AllocationRequest;
+import com.ubots.domain.exception.BusinessServiceException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,14 +30,22 @@ public class IssueAllocateController {
 
     @PatchMapping("/allocate/issue")
     public ResponseEntity<Object> allocateIssueToAttendant(
-        @RequestParam String issueId,
-        @RequestParam IssueType issueType,
-        @RequestParam String attendantId
+        @RequestBody AllocationRequest request
     ) {
-        return switch (issueType) {
-            case CARD -> ResponseEntity.ok(cardIssueService.allocate(issueId, attendantId));
-            case LOAN -> ResponseEntity.ok(loanIssueService.allocate(issueId, attendantId));
-            case OTHER -> ResponseEntity.ok(otherIssueService.allocate(issueId, attendantId));
-        };
+        try {
+            return switch (request.issueType()) {
+                case CARD -> ResponseEntity.ok(
+                    cardIssueService.allocate(request.issueId(), request.attendantId())
+                );
+                case LOAN -> ResponseEntity.ok(
+                    loanIssueService.allocate(request.issueId(), request.attendantId())
+                );
+                case OTHER -> ResponseEntity.ok(
+                    otherIssueService.allocate(request.issueId(), request.attendantId())
+                );
+            };
+        } catch (BusinessServiceException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }
