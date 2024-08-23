@@ -7,5 +7,4 @@ public interface AttendantService {
 
     Optional<Attendant> findAttendant(String attendantId);
 
-    Optional<Attendant> findAvailableAttendant();
 }

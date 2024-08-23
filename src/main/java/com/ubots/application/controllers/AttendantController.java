@@ -1,6 +1,7 @@
 package com.ubots.application.controllers;
 
 import com.ubots.application.interfaces.AttendantService;
+import com.ubots.domain.entities.support.AttendantType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,14 +29,12 @@ public class AttendantController {
     @GetMapping("/attendant")
     public ResponseEntity<Object> getAttendant(
         @RequestParam String attendantId,
-        @RequestParam String attendantType
+        @RequestParam AttendantType attendantType
     ) {
-
         return switch (attendantType) {
-            case "CARD" -> ResponseEntity.ok(cardAttendantService.findAttendant(attendantId));
-            case "LOAN" -> ResponseEntity.ok(loanAttendantService.findAttendant(attendantId));
-            case "OTHER" -> ResponseEntity.ok(otherAttendantService.findAttendant(attendantId));
-            default -> ResponseEntity.badRequest().build();
+            case CARD -> ResponseEntity.ok(cardAttendantService.findAttendant(attendantId));
+            case LOAN -> ResponseEntity.ok(loanAttendantService.findAttendant(attendantId));
+            case OTHER -> ResponseEntity.ok(otherAttendantService.findAttendant(attendantId));
         };
     }
 }

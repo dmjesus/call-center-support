@@ -21,10 +21,4 @@ public class DefaultAttendantService implements AttendantService {
         ).findFirst();
     }
 
-    @Override
-    public Optional<Attendant> findAvailableAttendant() {
-        return attendantList.stream().filter(att ->
-            att.getSupportQueue().size() < 3
-        ).findFirst();
-    }
 }

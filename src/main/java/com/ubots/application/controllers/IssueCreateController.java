@@ -3,7 +3,7 @@ package com.ubots.application.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ubots.application.interfaces.IssueService;
-import com.ubots.application.requests.CallMessage;
+import com.ubots.application.requests.CreateIssueRequest;
 import com.ubots.domain.entities.client.Client;
 import com.ubots.domain.entities.issue.Issue;
 import com.ubots.domain.entities.issue.IssueType;
@@ -38,12 +38,12 @@ public class IssueCreateController {
     @PostMapping("/issue")
     public ResponseEntity<Object> postMessage(@RequestBody String message) {
         try {
-            var callMessage = mapper.readValue(message, CallMessage.class);
+            var request = mapper.readValue(message, CreateIssueRequest.class);
 
-            switch (callMessage.type()) {
-                case LOAN -> loanIssueService.create(toIssue(callMessage));
-                case CARD -> cardIssueService.create(toIssue(callMessage));
-                default -> otherIssueService.create(toIssue(callMessage));
+            switch (request.type()) {
+                case LOAN -> loanIssueService.create(toIssue(request));
+                case CARD -> cardIssueService.create(toIssue(request));
+                default -> otherIssueService.create(toIssue(request));
             }
 
             return ResponseEntity.ok().build();
@@ -52,15 +52,15 @@ public class IssueCreateController {
         }
     }
 
-    private static Issue toIssue(CallMessage callMessage) {
+    private static Issue toIssue(CreateIssueRequest request) {
         return new Issue(
             new Client(
-                callMessage.client().id(),
-                callMessage.client().firstName(),
-                callMessage.client().lastName()
+                request.client().id(),
+                request.client().firstName(),
+                request.client().lastName()
             ),
-            IssueType.valueOf(callMessage.type().name()),
-            callMessage.options()
+            IssueType.valueOf(request.type().name()),
+            request.options()
         );
     }
 }
