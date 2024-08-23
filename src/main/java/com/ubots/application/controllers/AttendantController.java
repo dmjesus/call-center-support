@@ -15,9 +15,11 @@ public class AttendantController {
     private final AttendantService loanAttendantService;
     private final AttendantService otherAttendantService;
 
-    public AttendantController(AttendantService attendantService,
-        AttendantService cardAttendantService, AttendantService loanAttendantService,
-        AttendantService otherAttendantService) {
+    public AttendantController(
+        AttendantService cardAttendantService,
+        AttendantService loanAttendantService,
+        AttendantService otherAttendantService
+    ) {
         this.cardAttendantService = cardAttendantService;
         this.loanAttendantService = loanAttendantService;
         this.otherAttendantService = otherAttendantService;
@@ -29,18 +31,11 @@ public class AttendantController {
         @RequestParam String attendantType
     ) {
 
-        if("CARD".equalsIgnoreCase(attendantType)) {
-            return ResponseEntity.ok(cardAttendantService.findAttendant(attendantId));
-        }
-
-        if("LOAN".equalsIgnoreCase(attendantType)) {
-            return ResponseEntity.ok(loanAttendantService.findAttendant(attendantId));
-        }
-
-        if("OTHER".equalsIgnoreCase(attendantType)) {
-            return ResponseEntity.ok(otherAttendantService.findAttendant(attendantId));
-        }
-
-        return ResponseEntity.badRequest().build();
+        return switch (attendantType) {
+            case "CARD" -> ResponseEntity.ok(cardAttendantService.findAttendant(attendantId));
+            case "LOAN" -> ResponseEntity.ok(loanAttendantService.findAttendant(attendantId));
+            case "OTHER" -> ResponseEntity.ok(otherAttendantService.findAttendant(attendantId));
+            default -> ResponseEntity.badRequest().build();
+        };
     }
 }

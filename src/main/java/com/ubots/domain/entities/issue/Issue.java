@@ -6,7 +6,6 @@ import com.ubots.domain.entities.client.Client;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
-import org.springframework.cglib.core.Local;
 
 public record Issue(
     String id,
